@@ -132,7 +132,11 @@ def playable_from_untrusted(files, warn=False):
                 for entry in contents:
                     append_path(os.path.join(path, entry))
         elif stat.S_ISREG(mode):
-            if minirok.Globals.engine.can_play_path(path):
+            if os.path.splitext(path)[1] == ".m3u":
+                head, tail = os.path.split(path)
+                for line in open(path):
+                    append_path(os.path.join(head, line.strip()))
+            elif minirok.Globals.engine.can_play_path(path):
                 if path not in result:
                     result.append(path)
             else:
