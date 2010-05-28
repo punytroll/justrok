@@ -1029,7 +1029,7 @@ class PlaylistView(QtGui.QTreeView):
         else:
             minirok.logger.error('index for Track column not found :-?')
 
-        self.connect(self, QtCore.SIGNAL('activated(const QModelIndex &)'),
+        self.connect(self, QtCore.SIGNAL('doubleClicked(const QModelIndex &)'),
                 playlist.slot_activate_index)
 
         self.connect(playlist, QtCore.SIGNAL('scroll_needed'),
