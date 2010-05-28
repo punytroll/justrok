@@ -10,7 +10,9 @@ from PyKDE4 import kdeui
 from PyQt4 import QtGui, QtCore
 
 import minirok
-from minirok import scrobble, util
+from minirok import util
+if minirok._has_scrobble == True:
+    from minirok import scrobble
 try:
     from minirok.ui import options1
 except ImportError:
@@ -138,8 +140,6 @@ class GeneralPage(QtGui.QWidget, options1.Ui_Page):
             # This Ui_Page comes from ui/error.py.
             return
 
-        self.kcfg_LastfmServer.addItems(scrobble.Server.get_all_values())
-
         self.connect(self.kcfg_TagsFromRegex, QtCore.SIGNAL('toggled(bool)'),
                 self.slot_tags_from_regex_toggled)
 
@@ -149,10 +149,15 @@ class GeneralPage(QtGui.QWidget, options1.Ui_Page):
         self.connect(self.kcfg_LastfmServer,
                 QtCore.SIGNAL('currentIndexChanged(const QString &)'),
                 self.slot_lastfm_server_changed)
-
-        self.slot_enable_lastfm_toggled(preferences.lastfm.enable)
         self.slot_tags_from_regex_toggled(preferences.tags_from_regex)
-        self.slot_lastfm_server_changed(preferences.lastfm.server)
+
+        if minirok._has_scrobble == True:
+            self.kcfg_LastfmServer.addItems(scrobble.Server.get_all_values())
+            self.slot_enable_lastfm_toggled(preferences.lastfm.enable)
+            self.slot_lastfm_server_changed(preferences.lastfm.server)
+        else:
+            self.kcfg_EnableLastfm.setEnabled(False)
+            self.lastfmFrame.setEnabled(False)
 
     def slot_enable_lastfm_toggled(self, checked):
         self.lastfmFrame.setEnabled(checked)

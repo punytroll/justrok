@@ -133,8 +133,11 @@ except ImportError:
     try:
         import simplejson
     except ImportError:
-        _do_exit = True
-        _not_found.append('json or simplejson module')
+        _has_scrobble = False
+    else:
+        _has_scrobble = True
+else:
+    _has_scrobble = True
 
 try:
     import dbus

@@ -66,13 +66,16 @@ def main():
     # These imports happen here rather than at the top level because if gst
     # gets imported before the above KCmdLineArgs.init() call, it steals our
     # --help option
-    from minirok import engine, main_window as mw, scrobble
+    from minirok import engine, main_window as mw
+    if minirok._has_scrobble == True:
+        from minirok import scrobbler
+        
+        scrobbler = scrobble.Scrobbler()
+        scrobbler.start()
 
     minirok.Globals.engine = engine.Engine()
     application = kdeui.KApplication()
     main_window = mw.MainWindow()
-    scrobbler = scrobble.Scrobbler()
-    scrobbler.start()
 
     if minirok._has_dbus:
         import dbus
