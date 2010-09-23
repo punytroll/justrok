@@ -56,9 +56,11 @@ class TagReader(util.ThreadedWorker):
 
         tags = {}
 
-        for column in [ 'Track', 'Artist', 'Album', 'Title' ]:
+        for column in [ 'Track', 'Artist', 'Album', 'Title', 'Disc', 'Date' ]:
             if column == 'Track':
                 tag = 'tracknumber'
+            elif column == 'Disc':
+                tag = 'discnumber'
             else:
                 tag = column.lower()
 

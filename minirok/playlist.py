@@ -1158,7 +1158,7 @@ class PlaylistItem(object):
 
     # This class should be considered sort of private to the model
 
-    ALLOWED_TAGS = [ 'Track', 'Artist', 'Album', 'Title', 'Length' ]
+    ALLOWED_TAGS = [ 'Track', 'Artist', 'Album', 'Title', 'Length', 'Disc', 'Date' ]
 
     def __init__(self, path, tags=None):
         self.path = path
@@ -1292,8 +1292,13 @@ class Columns(QtGui.QHeaderView):
     CONFIG_SECTION = 'Playlist'
     CONFIG_OPTION = 'Columns'
     DEFAULT_COLUMNS = [
-        ('Track', 60, 1), ('Artist', 200, 1),
-        ('Album', 200, 0), ('Title', 275, 1), ('Length', 60, 1)
+        ('Disc', 60, 0),
+        ('Track', 60, 1),
+        ('Artist', 200, 1),
+        ('Album', 200, 0),
+        ('Title', 275, 1),
+        ('Date', 60, 0),
+        ('Length', 60, 1)
     ]
 
     def __init__(self, parent):
