@@ -173,6 +173,10 @@ class Systray(kdeui.KSystemTrayIcon):
         kdeui.KSystemTrayIcon.__init__(self, *args)
         self.setIcon(self.loadIcon('minirok'))
         self.installEventFilter(self)
+        self.contextMenu().addAction(minirok.Globals.action_collection.action('action_previous'))
+        self.contextMenu().addAction(minirok.Globals.action_collection.action('action_play_pause'))
+        self.contextMenu().addAction(minirok.Globals.action_collection.action('action_stop'))
+        self.contextMenu().addAction(minirok.Globals.action_collection.action('action_next'))
 
         self.connect(self,
                 QtCore.SIGNAL('activated(QSystemTrayIcon::ActivationReason)'),
