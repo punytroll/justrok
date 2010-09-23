@@ -68,7 +68,7 @@ def main():
     # --help option
     from minirok import engine, main_window as mw
     if minirok._has_scrobble == True:
-        from minirok import scrobbler
+        from minirok import scrobble
         
         scrobbler = scrobble.Scrobbler()
         scrobbler.start()
