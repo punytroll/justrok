@@ -69,13 +69,13 @@ def main():
     from minirok import engine, main_window as mw
     if minirok._has_scrobble == True:
         from minirok import scrobble
-        
-        scrobbler = scrobble.Scrobbler()
-        scrobbler.start()
 
     minirok.Globals.engine = engine.Engine()
     application = kdeui.KApplication()
     main_window = mw.MainWindow()
+    if minirok._has_scrobble == True:
+        scrobbler = scrobble.Scrobbler()
+        scrobbler.start()
 
     if minirok._has_dbus:
         import dbus
