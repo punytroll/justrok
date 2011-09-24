@@ -30,8 +30,8 @@ class Playlist(QtCore.QAbstractTableModel):
 
     def __init__(self, parent=None):
         QtCore.QAbstractTableModel.__init__(self, parent)
-        util.CallbackRegistry.register_save_config(self.save_config)
-        util.CallbackRegistry.register_apply_prefs(self.apply_preferences)
+        util.CallbackRegistry.register_at_exit(self.__at_exit)
+        util.CallbackRegistry.register_apply_preferences(self.__apply_preferences)
 
         # Core model stuff
         self._itemlist = []
@@ -67,7 +67,7 @@ class Playlist(QtCore.QAbstractTableModel):
 
         self.init_actions()
         self.init_undo_stack()
-        self.apply_preferences()
+        self.__apply_preferences()
         self.load_saved_playlist()
 
         # XXX This is dataChanged() abuse: there are a bunch of places in which
@@ -703,7 +703,7 @@ class Playlist(QtCore.QAbstractTableModel):
 
     ##
 
-    def apply_preferences(self):
+    def __apply_preferences(self):
         prefs = minirok.Globals.preferences
 
         if prefs.tags_from_regex:
@@ -723,7 +723,7 @@ class Playlist(QtCore.QAbstractTableModel):
 
     ##
 
-    def save_config(self):
+    def __at_exit(self):
         """Saves the current playlist."""
         paths = (item.path for item in self._itemlist)
 
@@ -1303,7 +1303,7 @@ class Columns(QtGui.QHeaderView):
 
     def __init__(self, parent):
         QtGui.QHeaderView.__init__(self, Qt.Horizontal, parent)
-        util.CallbackRegistry.register_save_config(self.save_config)
+        util.CallbackRegistry.register_at_exit(self.save_config)
 
         self.setMovable(True)
         self.setStretchLastSection(False)

@@ -199,39 +199,30 @@ def creat_excl(path, mode=0644):
 ##
 
 class CallbackRegistry(object):
-
-    # TODO: rename "save_config" to something else, eg. "at_exit".
-
-    SAVE_CONFIG = object()
-    APPLY_PREFS = object()
-
-    def __init__(self):
-        self._callbacks = {}
-
-    def register(self, type, callback):
-        self._callbacks.setdefault(type, []).append(callback)
-
-    def invoke_callbacks(self, type):
-        assert type in self._callbacks
-
-        for callback in self._callbacks[type]:
-            callback()
-
-    ##
-
-    def register_save_config(self, callback):
-        self.register(self.SAVE_CONFIG, callback)
-
-    def register_apply_prefs(self, callback):
-        self.register(self.APPLY_PREFS, callback)
-
-    ##
-
-    def save_config_all(self):
-        self.invoke_callbacks(self.SAVE_CONFIG)
-
-    def apply_preferences_all(self):
-        self.invoke_callbacks(self.APPLY_PREFS)
+	__AT_EXIT = "at-exit"
+	__APPLY_PREFERENCES = "apply-preferences"
+	
+	def __init__(self):
+		self.__callbacks = dict()
+	
+	def __register(self, type, callback):
+		self.__callbacks.setdefault(type, list()).append(callback)
+	
+	def __invoke_callbacks(self, type):
+		for callback in self.__callbacks.setdefault(type, list()):
+			callback()
+	
+	def register_at_exit(self, callback):
+		self.__register(self.__AT_EXIT, callback)
+	
+	def register_apply_preferences(self, callback):
+		self.__register(self.__APPLY_PREFERENCES, callback)
+	
+	def fire_at_exit(self):
+		self.__invoke_callbacks(self.__AT_EXIT)
+	
+	def fire_apply_preferences(self):
+		self.__invoke_callbacks(self.__APPLY_PREFERENCES)
 
 CallbackRegistry = CallbackRegistry()
 

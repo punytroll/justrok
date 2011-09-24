@@ -285,8 +285,8 @@ class Scrobbler(QtCore.QObject, threading.Thread):
         self.configured = threading.Condition()
         self.timer.setSingleShot(True)
 
-        util.CallbackRegistry.register_apply_prefs(self.apply_preferences)
-        self.apply_preferences() # Connect signals/slots, read user/passwd
+        util.CallbackRegistry.register_apply_preferences(self.__apply_preferences)
+        self.__apply_preferences()
 
         appdata = str(kdecore.KGlobal.dirs().saveLocation('appdata'))
         do_queue = False
@@ -351,7 +351,7 @@ class Scrobbler(QtCore.QObject, threading.Thread):
         else:
             self.lock_file = None
 
-        util.CallbackRegistry.register_save_config(self.cleanup)
+        util.CallbackRegistry.register_at_exit(self.cleanup)
 
     def cleanup(self):
         if self.lock_file is not None:
@@ -560,7 +560,7 @@ class Scrobbler(QtCore.QObject, threading.Thread):
 
     ##
 
-    def apply_preferences(self):
+    def __apply_preferences(self):
         # TODO: what if there's a queue and we get disabled?
         prefs = minirok.Globals.preferences.lastfm
 

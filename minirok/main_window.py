@@ -21,7 +21,7 @@ class MainWindow(kdeui.KXmlGuiWindow):
 
     def __init__ (self, *args):
         kdeui.KXmlGuiWindow.__init__(self, *args)
-        util.CallbackRegistry.register_save_config(self.save_config)
+        util.CallbackRegistry.register_at_exit(self.__at_exit)
 
         minirok.Globals.action_collection = self.actionCollection()
         minirok.Globals.preferences = preferences.Preferences()
@@ -99,10 +99,10 @@ class MainWindow(kdeui.KXmlGuiWindow):
                 minirok.Globals.preferences)
             self.connect(dialog,
                     QtCore.SIGNAL('settingsChanged(const QString &)'),
-                    util.CallbackRegistry.apply_preferences_all)
+                    util.CallbackRegistry.fire_apply_preferences)
             dialog.show()
 
-    def save_config(self):
+    def __at_exit(self):
         pass
 
     ##
@@ -115,7 +115,7 @@ class MainWindow(kdeui.KXmlGuiWindow):
         return self._flag_really_quit or finishing_session
 
     def queryExit(self):
-        util.CallbackRegistry.save_config_all()
+        util.CallbackRegistry.fire_at_exit()
         kdecore.KGlobal.config().sync()
         return True
 

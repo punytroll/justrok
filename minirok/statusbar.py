@@ -181,7 +181,7 @@ class MultiIconLabel(QtGui.QLabel):
         :param tooltips: tooltips associated with each icon/state.
         """
         QtGui.QLabel.__init__(self, parent)
-        util.CallbackRegistry.register_save_config(self.save_config)
+        util.CallbackRegistry.register_at_exit(self.__at_exit)
         self.connect(self, QtCore.SIGNAL('clicked(int)'), self.slot_clicked)
 
         if icons is not None:
@@ -209,26 +209,21 @@ class MultiIconLabel(QtGui.QLabel):
 
     def mousePressEvent(self, event=None):
         self.state += 1
-
         if self.state >= len(self.icons):
             self.state = 0
-
         self.setPixmap(self.icons[self.state])
-
         tooltip = self.tooltips[self.state]
-
         if tooltip is not None:
             self.setToolTip(tooltip)
         else:
             self.setToolTip('')
-
         self.emit(QtCore.SIGNAL('clicked(int)'), self.state)
 
     def slot_clicked(self, state):
         raise NotImplementedError, \
             'MultiIconLabel.slot_clicked must be reimplemented in subclasses.'
 
-    def save_config(self):
+    def __at_exit(self):
         if self.CONFIG_OPTION is not None:
             config = kdecore.KGlobal.config().group(self.CONFIG_SECTION)
             config.writeEntry(self.CONFIG_OPTION, QtCore.QVariant(self.state))
