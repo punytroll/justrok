@@ -10,7 +10,7 @@ from PyQt4 import QtGui, QtCore
 from PyKDE4 import kio, kdeui, kdecore
 
 import minirok
-from minirok import left_side, preferences, right_side, statusbar, util
+from minirok import preferences, right_side, statusbar, util
 
 ##
 
@@ -26,27 +26,10 @@ class MainWindow(kdeui.KXmlGuiWindow):
         minirok.Globals.action_collection = self.actionCollection()
         minirok.Globals.preferences = preferences.Preferences()
 
-        self.main_view = QtGui.QSplitter(self)
-        self.left_side = left_side.LeftSide(self.main_view)
-        self.right_side = right_side.RightSide(self.main_view, main_window=self)
-
-        policy = QtGui.QSizePolicy()
-        policy.setHorizontalStretch(1)
-        self.left_side.setSizePolicy(policy)
-
-        policy = QtGui.QSizePolicy()
-        policy.setHorizontalStretch(3)
-        self.right_side.setSizePolicy(policy)
+        self.main_view = right_side.RightSide(self, main_window = self)
 
         self.statusbar = statusbar.StatusBar(self)
         self.setStatusBar(self.statusbar)
-
-        # Restore splitter state
-        config = kdecore.KGlobal.config().group(self.CONFIG_SECTION)
-        sstate = config.readEntry(self.CONFIG_OPTION_SPLITTER_STATE,
-                                  QtCore.QVariant(QtCore.QByteArray())).toByteArray()
-        if not sstate.isEmpty():
-            self.main_view.restoreState(sstate)
 
         self.init_systray()
         self.init_actions()
@@ -82,9 +65,6 @@ class MainWindow(kdeui.KXmlGuiWindow):
         actionCollection = self.actionCollection()
 
         # File menu
-        self.action_open_directory = util.create_action('action_open_directory',
-                'Open directory...', self.slot_open_directory, 'document-open-folder', 'Ctrl+F')
-
         self.action_quit = kdeui.KStandardAction.quit(self.slot_really_quit,
                 actionCollection)
 
@@ -107,22 +87,6 @@ class MainWindow(kdeui.KXmlGuiWindow):
             self.slot_really_quit)
         self.systray.show()
 
-    ##
-
-    def slot_open_directory(self):
-        """Open a dialog to select a directory, and set it in the tree view."""
-        # NOTE: Not using KFileDialog.getExistingDirectory() here, because
-        # it pops up just a tree view which I don't find very useable.
-        urls = self.left_side.path_combo.urls()
-        current = urls.first() if not urls.isEmpty() else '~'
-        dialog = kio.KFileDialog(kdecore.KUrl(current), 'Directories', self)
-        dialog.setCaption('Open directory')
-        dialog.setMode(kio.KFile.Directory)
-        dialog.exec_()
-        directory = dialog.selectedFile()
-        if directory:
-            self.left_side.path_combo.slot_set_url(directory)
-
     def slot_really_quit(self):
         self._flag_really_quit = True
         self.close()
@@ -139,8 +103,7 @@ class MainWindow(kdeui.KXmlGuiWindow):
             dialog.show()
 
     def save_config(self):
-        config = kdecore.KGlobal.config().group(self.CONFIG_SECTION)
-        config.writeEntry(self.CONFIG_OPTION_SPLITTER_STATE, self.main_view.saveState())
+        pass
 
     ##
 
