@@ -29,9 +29,10 @@ class GStreamerEngine(QtCore.QObject):
 
     PLUGINS = {
             'flac': [ '.flac' ],
-            'mad': [ '.mp3', ],
-            'musepack': [ '.mpc', '.mp+', ],
+            'mad': [ '.mp3' ],
+            'musepack': [ '.mpc', '.mp+' ],
             'vorbis': [ '.ogg' ],
+            'ffmpeg': [ '.wma' ]
     }
 
     def __init__(self):
@@ -39,8 +40,12 @@ class GStreamerEngine(QtCore.QObject):
 
         self._supported_extensions = []
         for plugin, extensions in self.PLUGINS.items():
+            print("Testing plugin \"" + plugin + "\" ..."),
             if gst.registry_get_default().find_plugin(plugin) is not None:
+                print("supported.")
                 self._supported_extensions.extend(extensions)
+            else:
+                print("NOT supported.")
 
         self.uri = None
         self._status = State.STOPPED

@@ -177,7 +177,7 @@ class Playlist(QtCore.QAbstractTableModel):
 
             if not mimedata.hasFormat(drag.FileListDrag.MIME_TYPE):
                 # Drop does not come from ourselves, so:
-                files = util.playable_from_untrusted(files, warn=False)
+                files = util.playable_from_untrusted(files, warn=True)
 
             if (QtGui.QApplication.keyboardModifiers() & Qt.ControlModifier):
                 row = -1
