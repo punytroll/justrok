@@ -32,7 +32,7 @@ class GStreamerEngine(QtCore.QObject):
             'mad': [ '.mp3' ],
             'musepack': [ '.mpc', '.mp+' ],
             'vorbis': [ '.ogg' ],
-            'ffmpeg': [ '.wma' ]
+            'ffmpeg': [ '.wma', '.amr', '.aac' ]
     }
 
     def __init__(self):
