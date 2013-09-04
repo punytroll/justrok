@@ -28,11 +28,12 @@ class GStreamerEngine(QtCore.QObject):
     SINK = 'alsasink'
 
     PLUGINS = {
-            'flac': [ '.flac' ],
-            'mad': [ '.mp3' ],
-            'musepack': [ '.mpc', '.mp+' ],
-            'vorbis': [ '.ogg' ],
-            'ffmpeg': [ '.wma', '.amr', '.aac' ]
+        'flac': [ '.flac' ],
+        'mad': [ '.mp3' ],
+        'musepack': [ '.mpc', '.mp+' ],
+        'vorbis': [ '.ogg' ],
+        'ffmpeg': [ '.wma', '.amr', '.aac' ],
+        'wavpack': [ '.wav' ]
     }
 
     def __init__(self):
