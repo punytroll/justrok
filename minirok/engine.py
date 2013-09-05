@@ -1,15 +1,16 @@
 #! /usr/bin/env python
 ## vim: fileencoding=utf-8
 #
-# Copyright (c) 2007-2008 Adeodato Simó (dato@net.com.org.es)
+# Copyright (c) 2007-2008, 2010 Adeodato Simó (dato@net.com.org.es)
 # Licensed under the terms of the MIT license.
+
+import minirok
 
 import os
 
-import gst
 import gobject
+import gst
 
-import minirok
 from PyQt4 import QtCore
 
 gobject.threads_init()
@@ -28,7 +29,7 @@ class GStreamerEngine(QtCore.QObject):
     SINK = 'alsasink'
 
     PLUGINS = {
-        'flac': [ '.flac' ],
+            'flac': [ '.flac' ],
         'mad': [ '.mp3' ],
         'musepack': [ '.mpc', '.mp+' ],
         'vorbis': [ '.ogg' ],
