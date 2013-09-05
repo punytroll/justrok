@@ -11,9 +11,7 @@ import os
 from PyKDE4 import kdecore, kdeui, kio
 from PyQt4 import QtCore, QtGui
 
-from minirok import (
 import minirok
-    left_side,
 from minirok import preferences, right_side, statusbar, util
 
 ##
