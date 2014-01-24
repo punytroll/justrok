@@ -228,7 +228,7 @@ class ProcInfo(object):
         elif self.data['version'] == '1.1':
             try:
                 proc = psutil.Process(self.data['pid'])
-            except psutil.error.NoSuchProcess:
+            except psutil.NoSuchProcess:
                 return False
             else:
                 return proc.cmdline == self.data['cmdline']
