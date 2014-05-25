@@ -209,7 +209,7 @@ class ProcInfo(object):
             d['pid'] = pid
             d['version'] = '1.1'
             try:
-                d['cmdline'] = psutil.Process(pid).cmdline
+                d['cmdline'] = psutil.Process(pid).cmdline()
             except psutil.error:
                 d['version'] = '1.0'
 
