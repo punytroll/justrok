@@ -56,27 +56,29 @@ class TagReader(util.ThreadedWorker):
                 msg = 'could not read tags from %s: %s' % (path, e)
             minirok.logger.warning(msg)
             return {}
-
-        tags = {}
-
+        print info
+        result = {}
         for column in [ 'Track', 'Artist', 'Album', 'Title', 'Disc', 'Date' ]:
-            if column == 'Track':
-                tag = 'tracknumber'
-            elif column == 'Disc':
-                tag = 'discnumber'
-            else:
-                tag = column.lower()
-
             try:
-                tags[column] = info[tag][0]
+                if column == 'Track':
+                    if 'tracktotal' in info:
+                        result[column] = info['tracknumber'][0] + '/' + info['tracktotal'][0]
+                    else:
+                        result[column] = info['tracknumber'][0]
+                elif column == 'Disc':
+                    if 'disctotal' in info:
+                        result[column] = info['discnumber'][0] + '/' + info['disctotal'][0]
+                    else:
+                        result[column] = info['discnumber'][0]
+                else:
+                    result[column] = info[column.lower()][0]
             except ValueError:
                 minirok.logger.warn('invalid tag %r for %s', tag, type(info))
             except KeyError:
                 pass  # Tag is not present in the file.
-
         try:
-            tags['Length'] = int(info.info.length)
+            result['Length'] = int(info.info.length)
         except AttributeError:
             pass
 
-        return tags
+        return result
