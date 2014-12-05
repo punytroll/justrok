@@ -109,7 +109,7 @@ try:
         kdeui,  # Used below.
         kio,
     )
-except ImportError, e:
+except ImportError as e:
     _do_exit = True
     _not_found.append('PyKDE (error was: %s)' % e)
 
@@ -120,15 +120,12 @@ except ImportError:
     _not_found.append('Mutagen')
 
 try:
-    # Do not import gst instead of pygst here, or gst will eat our --help.
-    import pygst
-    pygst.require('0.10')
+    import gi
+    gi.require_version("Gst", "1.0")
+    from gi.repository import Gst
 except ImportError:
     _do_exit = True
     _not_found.append('GStreamer Python bindings')
-except pygst.RequiredVersionError:
-    _do_exit = True
-    _not_found.append('GStreamer Python bindings (>= 0.10)')
 
 try:
     import json

@@ -9,12 +9,14 @@ import minirok
 import os
 import urllib
 
-import gobject
-import gst
+import gi
+gi.require_version("Gst", "1.0")
+from gi.repository import GObject, Gst
 
 from PyQt4 import QtCore
 
-gobject.threads_init()
+GObject.threads_init()
+Gst.init(None)
 
 ##
 
@@ -31,7 +33,7 @@ class GStreamerEngine(QtCore.QObject):
 
     PLUGINS = {
         'faad': ['.m4a'],
-            'flac': [ '.flac' ],
+        'flac': [ '.flac' ],
         'mad': [ '.mp3' ],
         'musepack': [ '.mpc', '.mp+' ],
         'vorbis': [ '.ogg' ],
@@ -45,7 +47,7 @@ class GStreamerEngine(QtCore.QObject):
         self._supported_extensions = []
         for plugin, extensions in self.PLUGINS.items():
             print("Testing plugin \"" + plugin + "\" ..."),
-            if gst.registry_get_default().find_plugin(plugin) is not None:
+            if Gst.Registry.find_plugin(Gst.Registry.get(), plugin) is not None:
                 print("supported.")
                 self._supported_extensions.extend(extensions)
             else:
@@ -53,11 +55,11 @@ class GStreamerEngine(QtCore.QObject):
 
         self.uri = None
         self._status = State.STOPPED
-        self.bin = gst.element_factory_make('playbin')
+        self.bin = Gst.ElementFactory.make('playbin', None)
         self.bin.set_property('video-sink', None)
         try:
-            device = gst.parse_launch(self.SINK)
-        except gobject.GError:
+            device = Gst.parse_launch(self.SINK)
+        except GObject.GError:
             pass
         else:
             self.bin.set_property('audio-sink', device)
@@ -68,7 +70,7 @@ class GStreamerEngine(QtCore.QObject):
         bus.connect('message::error', self._message_error)
         bus.connect('message::async-done', self._message_async_done)
 
-        self.time_fmt = gst.Format(gst.FORMAT_TIME)
+        self.time_fmt = Gst.Format(Gst.Format.TIME)
         self.seek_pending = False
 
     ##
@@ -93,29 +95,29 @@ class GStreamerEngine(QtCore.QObject):
     ##
 
     def play(self, path):
+        self.bin.set_state(Gst.State.NULL)
         self.uri = 'file://' + urllib.quote(os.path.abspath(path), ' /')
         self.bin.set_property('uri', self.uri)
-        self.bin.set_state(gst.STATE_NULL)
-        self.bin.set_state(gst.STATE_PLAYING)
+        self.bin.set_state(Gst.State.PLAYING)
         self.status = State.PLAYING
 
     def pause(self, paused=True):
         if paused:
-            self.bin.set_state(gst.STATE_PAUSED)
+            self.bin.set_state(Gst.State.PAUSED)
             self.status = State.PAUSED
         else:
-            self.bin.set_state(gst.STATE_PLAYING)
+            self.bin.set_state(Gst.State.PLAYING)
             self.status = State.PLAYING
 
     def stop(self):
-        self.bin.set_state(gst.STATE_NULL)
+        self.bin.set_state(Gst.State.NULL)
         self.status = State.STOPPED
 
     def get_position(self):
         """Returns the current position as an int in seconds."""
         try:
-            return int(round(self.bin.query_position(self.time_fmt)[0] / gst.SECOND))
-        except gst.QueryError:
+            return int(round(self.bin.query_position(self.time_fmt)[1] / Gst.SECOND))
+        except Gst.QueryError:
             return 0
 
     def set_position(self, seconds):
@@ -125,14 +127,12 @@ class GStreamerEngine(QtCore.QObject):
         after the seek has been performed.
         """
         self.seek_pending = True
-        self.bin.seek_simple(self.time_fmt, gst.SEEK_FLAG_FLUSH |
-                gst.SEEK_FLAG_KEY_UNIT, seconds * gst.SECOND)
-        # self.bin.get_state(gst.CLOCK_TIME_NONE) # block until done
+        self.bin.seek_simple(self.time_fmt, Gst.SeekFlags.FLUSH | Gst.SeekFlags.KEY_UNIT, seconds * Gst.SECOND)
 
     ##
 
     def _message_eos(self, bus, message):
-        self.bin.set_state(gst.STATE_NULL)
+        self.bin.set_state(Gst.State.NULL)
         self.status = State.STOPPED
         self.emit(QtCore.SIGNAL('end_of_stream'))
 

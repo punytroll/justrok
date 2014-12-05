@@ -22,7 +22,7 @@ class MainWindow(kdeui.KXmlGuiWindow):
     CONFIG_OPTION_SPLITTER_STATE = 'splitterState'
 
     def __init__ (self, *args):
-        kdeui.KXmlGuiWindow.__init__(self, *args)
+        kdeui.KXmlGuiWindow.__init__(self)
         util.CallbackRegistry.register_at_exit(self.__at_exit)
 
         minirok.Globals.action_collection = self.actionCollection()
