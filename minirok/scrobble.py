@@ -10,7 +10,7 @@ import minirok
 
 import errno
 import hashlib
-import httplib
+import httplib2
 import os
 import re
 import socket
