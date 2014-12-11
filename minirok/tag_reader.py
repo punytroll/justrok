@@ -56,7 +56,7 @@ class TagReader(util.ThreadedWorker):
                 msg = 'could not read tags from %s: %s' % (path, e)
             minirok.logger.warning(msg)
             return {}
-        print info
+        print(info)
         result = {}
         for column in [ 'Track', 'Artist', 'Album', 'Title', 'Disc', 'Date' ]:
             try:

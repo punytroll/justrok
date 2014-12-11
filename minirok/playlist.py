@@ -732,7 +732,7 @@ class Playlist(QtCore.QAbstractTableModel):
         if prefs.tags_from_regex:
             try:
                 self._regex = re.compile(prefs.tag_regex)
-            except re.error, e:
+            except re.error as e:
                 minirok.logger.error('invalid regular expresion %s: %s',
                                      prefs.tag_regex, e)
                 self._regex = None
@@ -752,7 +752,7 @@ class Playlist(QtCore.QAbstractTableModel):
 
         try:
             playlist = open(self.saved_playlist_path(), 'w')
-        except IOError, e:
+        except IOError as e:
             minirok.logger.error('could not save playlist: %s', e)
         else:
             playlist.write('\0'.join(paths))
@@ -761,7 +761,7 @@ class Playlist(QtCore.QAbstractTableModel):
     def load_saved_playlist(self):
         try:
             playlist = open(self.saved_playlist_path())
-        except IOError, e:
+        except IOError as e:
             if e.errno == errno.ENOENT:
                 pass
             else:

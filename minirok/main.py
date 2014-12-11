@@ -112,7 +112,7 @@ def append_to_remote_minirok_successful(files):
 
     try:
         p = Popen(cmdline, stdout=PIPE, stderr=PIPE)
-    except OSError, e:
+    except OSError as e:
         if e.errno == errno.ENOENT:
             minirok.logger.warn('could not exec %s', cmdline[0])
             return False

@@ -161,7 +161,7 @@ else:
             _has_dbus = False
 
 if _not_found:
-    print >>sys.stderr, ('''\
+    print('''\
 The following required libraries could not be found on your system:
 
 %s
