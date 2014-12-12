@@ -15,10 +15,10 @@ import os
 import re
 import socket
 import string
+import sys
 import threading
 import time
 import urllib
-import urlparse
 
 try:
     import json
@@ -153,25 +153,18 @@ class Request(object):
         self.body = []
         self.error = None
         self.failed = False
-
-        url = urlparse.urlparse(url)
-        conn = httplib.HTTPConnection(url.netloc)
         try:
-            conn.request(
-                'POST', url.path, urllib.urlencode(params),
-                {'Content-Type': 'application/x-www-form-urlencoded'})
-        except socket.error, e:
+            conn = httplib2.Http()
+            response, content = conn.request(url, "POST", urllib.urlencode(params), {'Content-Type': 'application/x-www-form-urlencoded'})
+        except socket.error as e:
             self.failed = True
             self.error = e.args[1]  # No e.message available.
         else:
-            resp = conn.getresponse()
-
-            if resp.status != httplib.OK:
+            if response.status != 200:
                 self.failed = True
-                self.error = resp.reason
+                self.error = "Reason ..."
             else:
-                self.body = resp.read().rstrip('\n').split('\n')
-
+                self.body = content.rstrip('\n').split('\n')
                 if not self.body:
                     self.failed = True
                     self.error = 'no response received from server'
@@ -220,7 +213,7 @@ class ProcInfo(object):
         if self.data['version'] == '1.0':
             try:
                 os.kill(self.data['pid'], 0)
-            except OSError, e:
+            except OSError as e:
                 return (False if e.errno == errno.ESRCH
                         else True)  # ESRCH: no such PID.
             else:
@@ -300,7 +293,7 @@ class Scrobbler(QtCore.QObject, threading.Thread):
         if not os.path.isdir(self.spool):
             try:
                 os.mkdir(self.spool)
-            except OSError, e:
+            except OSError as e:
                 minirok.logger.error('could not create scrobbling spool: %s', e)
                 self.spool = None
         # ... else ensure it is readable and writable.
@@ -322,7 +315,7 @@ class Scrobbler(QtCore.QObject, threading.Thread):
             scrobble_lock = os.path.join(appdata, APPDATA_SCROBBLE_LOCK)
             try:
                 lockfile = open(scrobble_lock)
-            except IOError, e:
+            except IOError as e:
                 if e.errno == errno.ENOENT:
                     do_queue = True
                 else:
@@ -370,9 +363,9 @@ class Scrobbler(QtCore.QObject, threading.Thread):
 
         try:
             self.current_track = Submission(tags)
-        except Submission.RequiredDataMissing, e:
+        except Submission.RequiredDataMissing as e:
             minirok.logger.info('track missing required tags, not scrobbling')
-        except Submission.TrackTooShort, e:
+        except Submission.TrackTooShort as e:
             minirok.logger.info('track shorter than %d seconds, '
                                 'not scrobbling', TRACK_MIN_LENGTH)
         else:
@@ -424,7 +417,7 @@ class Scrobbler(QtCore.QObject, threading.Thread):
         for x in [''] + list(string.ascii_lowercase):
             try:
                 f = util.creat_excl(path + x)
-            except OSError, e:
+            except OSError as e:
                 if e.errno != errno.EEXIST:
                     raise
             else:
@@ -450,7 +443,7 @@ class Scrobbler(QtCore.QObject, threading.Thread):
             if self.session_key is None:
                 try:
                     self.do_handshake()
-                except HandshakeFatalError, e:
+                except HandshakeFatalError as e:
                     minirok.logger.error('aborting scrobbler: %s', e)
                     return
 
@@ -472,7 +465,6 @@ class Scrobbler(QtCore.QObject, threading.Thread):
                     params.update(track.get_params(i))
 
                 req = Request(self.scrobble_url, params)
-
                 if req.failed:
                     if req.error.startswith('BADSESSION'):
                         self.session_key = None  # Trigger re-handshake.
@@ -491,7 +483,7 @@ class Scrobbler(QtCore.QObject, threading.Thread):
                         if t.path is not None:
                             try:
                                 os.unlink(t.path)
-                            except OSError, e:
+                            except OSError as e:
                                 if e.errno != errno.ENOENT:
                                     raise
 
@@ -505,7 +497,6 @@ class Scrobbler(QtCore.QObject, threading.Thread):
                 params.update(current_track.get_now_playing_params())
 
                 req = Request(self.now_playing_url, params)
-
                 if req.failed:
                     minirok.logger.info(
                         'could not send "now playing" information: %s',

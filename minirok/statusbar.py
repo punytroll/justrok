@@ -234,8 +234,7 @@ class MultiIconLabel(QtGui.QLabel):
         self.emit(QtCore.SIGNAL('clicked(int)'), self.state)
 
     def slot_clicked(self, state):
-        raise NotImplementedError, \
-            'MultiIconLabel.slot_clicked must be reimplemented in subclasses.'
+        raise NotImplementedError('MultiIconLabel.slot_clicked must be reimplemented in subclasses.')
 
     def __at_exit(self):
         if self.CONFIG_OPTION is not None:

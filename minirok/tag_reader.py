@@ -49,7 +49,7 @@ class TagReader(util.ThreadedWorker):
                     'could not read tags from %s: mutagen.File() returned None',
                     path)
                 return {}
-        except Exception, e:
+        except Exception as e:
             if path in str(e):  # Mutagen included the path in the exception.
                 msg = 'could not read tags: %s' % e
             else:

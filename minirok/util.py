@@ -130,14 +130,14 @@ def playable_from_untrusted(files, warn=False):
     def append_path(path):
         try:
             mode = os.stat(path).st_mode
-        except OSError, e:
+        except OSError as e:
             warn('skipping %r: %s', path, e.strerror)
             return
 
         if stat.S_ISDIR(mode):
             try:
                 contents = sorted(os.listdir(path))
-            except OSError, e:
+            except OSError as e:
                 warn('skipping %r: %s', path, e.strerror)
             else:
                 for entry in contents:
@@ -205,7 +205,7 @@ def ensure_utf8(string):
             return string
 
 
-def creat_excl(path, mode=0644):
+def creat_excl(path, mode=0o644):
     """Return a write-only file object created with O_EXCL."""
     fd = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_EXCL, mode)
     return os.fdopen(fd, 'w')

@@ -15,7 +15,13 @@ from PyQt4 import QtGui
 ##
 
 def main():
-    _ = kdecore.ki18n
+    def translate(text):
+        if sys.version_info.major >= 3:
+            return kdecore.ki18n(text.encode("utf-8"))
+        else:
+            return kdecore.ki18n(text)
+    
+    _ = translate
     emptyloc = kdecore.KLocalizedString()
 
     about_data = kdecore.KAboutData(
