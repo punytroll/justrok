@@ -12,7 +12,7 @@ from PyKDE4 import kdecore, kdeui, kio
 from PyQt4 import QtCore, QtGui
 
 import minirok
-from minirok import preferences, right_side, statusbar, util
+from minirok import engine, preferences, right_side, statusbar, util
 
 ##
 
@@ -57,6 +57,9 @@ class MainWindow(kdeui.KXmlGuiWindow):
 
         self.setupGUI(*setupGUI_args)
 
+        self.connect(minirok.Globals.playlist, QtCore.SIGNAL('new_track'), self.slot_playlist_new_track)
+        self.connect(minirok.Globals.engine, QtCore.SIGNAL('status_changed'), self.slot_engine_status_changed)
+        
         # We only want the app to exit if Quit was called from the systray icon
         # or from the File menu, not if the main window was closed. Use a flag
         # so that slot_really_quit() and queryClose() know what to do.
@@ -91,6 +94,12 @@ class MainWindow(kdeui.KXmlGuiWindow):
                              QtCore.SIGNAL('quitSelected()'),
                              self.slot_really_quit)
         self.systray.show()
+    
+    def slot_playlist_new_track(self):
+        self.__update_window_title()
+    
+    def slot_engine_status_changed(self, new_status):
+        self.__update_window_title()
 
     def slot_really_quit(self):
         self._flag_really_quit = True
@@ -106,6 +115,23 @@ class MainWindow(kdeui.KXmlGuiWindow):
                          QtCore.SIGNAL('settingsChanged(const QString &)'),
                     util.CallbackRegistry.fire_apply_preferences)
             dialog.show()
+    
+    def __update_window_title(self):
+        new_window_title = None
+        tags = minirok.Globals.playlist.get_current_tags()
+        if tags != None:
+            title = tags.get('Title')
+            artist = tags.get('Artist')
+            if artist != None:
+                new_window_title = artist
+            if title != None:
+                if artist != None:
+                    new_window_title += " - " + title
+                else:
+                    new_window_title = title
+        if new_window_title == None:
+            new_window_title = minirok.__progname__
+        self.setWindowTitle(new_window_title)
 
     def __at_exit(self):
         pass
