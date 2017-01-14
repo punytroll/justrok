@@ -34,19 +34,18 @@ class GStreamerEngine(QtCore.QObject):
     PLUGINS = {
         'faad': ['.m4a'],
         'flac': [ '.flac' ],
-        'mad': [ '.mp3' ],
-        'musepack': [ '.mpc', '.mp+' ],
+        'mad': [ '.mp3', '.mp2', '.mp1', '.mpga' ],
+        'libav': [ '.aac', '.mpc', '.mp+', '.amr', '.wma' ],
         'vorbis': [ '.ogg' ],
-        'ffmpeg': [ '.wma', '.amr', '.aac' ],
-        'wavpack': [ '.wav' ]
+        'wavpack': [ '.wv', '.wvp' ]
     }
 
     def __init__(self):
         QtCore.QObject.__init__(self)
 
-        self._supported_extensions = []
+        self._supported_extensions = [ ".wav" ]
         for plugin, extensions in self.PLUGINS.items():
-            print("Testing plugin \"" + plugin + "\" ..."),
+            print("Testing plugin \"" + plugin + "\" ...")
             if Gst.Registry.find_plugin(Gst.Registry.get(), plugin) is not None:
                 print("supported.")
                 self._supported_extensions.extend(extensions)
