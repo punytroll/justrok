@@ -58,7 +58,7 @@ class MainWindow(kdeui.KXmlGuiWindow):
         self.setupGUI(*setupGUI_args)
 
         self.connect(minirok.Globals.playlist, QtCore.SIGNAL('new_track'), self.slot_playlist_new_track)
-        self.connect(minirok.Globals.engine, QtCore.SIGNAL('status_changed'), self.slot_engine_status_changed)
+        self.connect(minirok.Globals.engine, QtCore.SIGNAL('status_changed'), self.slot_engine_state_changed)
         
         # We only want the app to exit if Quit was called from the systray icon
         # or from the File menu, not if the main window was closed. Use a flag
@@ -96,10 +96,13 @@ class MainWindow(kdeui.KXmlGuiWindow):
         self.systray.show()
     
     def slot_playlist_new_track(self):
-        self.__update_window_title()
+        self.__update_window_title(minirok.Globals.playlist.get_current_tags())
     
-    def slot_engine_status_changed(self, new_status):
-        self.__update_window_title()
+    def slot_engine_state_changed(self, new_state):
+        if new_state == engine.State.PLAYING or new_state == engine.State.PAUSED:
+            self.__update_window_title(minirok.Globals.playlist.get_current_tags())
+        else:
+            self.__update_window_title(None)
 
     def slot_really_quit(self):
         self._flag_really_quit = True
@@ -116,9 +119,8 @@ class MainWindow(kdeui.KXmlGuiWindow):
                     util.CallbackRegistry.fire_apply_preferences)
             dialog.show()
     
-    def __update_window_title(self):
+    def __update_window_title(self, tags):
         new_window_title = None
-        tags = minirok.Globals.playlist.get_current_tags()
         if tags != None:
             title = tags.get('Title')
             artist = tags.get('Artist')
