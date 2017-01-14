@@ -15,18 +15,22 @@ filesystem_encoding = sys.getfilesystemencoding()
 
 ##
 
-__appname__     = 'minirok'
-__progname__    = 'Minirok'
-__version__     = '2.2~dev'
-__description__ = 'A small music player written in Python'
-__copyright__   = 'Copyright (c) 2007-2009 Adeodato Simó'
-__homepage__    = 'http://chistera.yi.org/~dato/code/minirok'
-__bts__         = 'http://bugs.debian.org'
+__appname__     = 'justrok'
+__progname__    = 'Justrok'
+__version__     = '1.0'
+__description__ = 'A minimalistic music player written in Python.'
+__copyright__   = 'Copyright (c) 2007-2009 Adeodato Simó, 2010-2017 Hagen Möbius'
+__homepage__    = 'https://github.com/punytroll/justrok'
+__bts__         = 'https://github.com/punytroll/justrok/issues'
 __authors__     = [
-    ('Adeodato Simó', '', 'dato@net.com.org.es'),
+    ('Hagen Möbius', '', 'hagen.moebius@googlemail.com'),
 ]
 __thanksto__    = [
     # ('Name', 'Task', 'Email', 'Webpage'),
+    ('Adeodato Simó',
+     'For writing minirok, the basis of justrok.',
+     'dato@net.com.org.es',
+     ''),
     ('The Amarok developers',
      'For their design and ideas, which I copied.\n'
      'And their code, which I frequently copied in the early days.',
@@ -126,6 +130,12 @@ try:
 except ImportError:
     _do_exit = True
     _not_found.append('GStreamer Python bindings')
+
+try:
+    import httplib2
+except ImportError:
+    _do_exit = True
+    _not_found.append('httplib2')
 
 try:
     import json
