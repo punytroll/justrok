@@ -518,12 +518,10 @@ class Playlist(QtCore.QAbstractTableModel):
 
     def slot_update_tags(self):
         rows = []
-
         for item, tags in self.tag_reader.pop_done():
             item.update_tags(tags)
             item.needs_tag_reader = False
             rows.append(item.position)
-
         if rows:
             self.my_emit_dataChanged(min(rows), max(rows))
 
@@ -1230,19 +1228,6 @@ class PlaylistItem(object):
             if tag not in self._tags:
                 minirok.logger.warn('unknown tag %s', tag)
                 continue
-            if tag == 'Track':
-                try:
-                    # Remove leading zeroes.
-                    value = str(int(value))
-                except ValueError:
-                    pass
-            elif tag == 'Length':
-                try:
-                    value = int(value)
-                except ValueError:
-                    minirok.logger.warn('invalid length: %r', value)
-                    continue
-
             self._tags[tag] = value
 
     ##
