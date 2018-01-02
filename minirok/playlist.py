@@ -1188,48 +1188,39 @@ class PlaylistView(QtGui.QTreeView):
 ##
 
 class PlaylistItem(object):
-
-    # This class should be considered sort of private to the model
-
-    ALLOWED_TAGS = [ 'Track', 'Artist', 'Album', 'Title', 'Length', 'Disc', 'Date' ]
-
+    
+    ALLOWED_TAGS = [ 'Track', 'Artist', 'Album', 'Title', 'Length', 'Disc', 'Date', 'Commentary' ]
+    
     def __init__(self, path, tags=None):
         self.path = path
-
         self._tags = dict((tag, None) for tag in self.ALLOWED_TAGS)
-
         if tags is not None:
             self.update_tags(tags)
-
-        # these are maintained up to date by the model
         self.position = None
         self.queue_position = None
         self.already_played = False
         self.needs_tag_reader = True
-
-    ##
-
+    
     def tags(self):
         return self._tags.copy()
-
+    
     def tag_text(self, tag):
         value = self._tags[tag]
-
         if tag == 'Length' and value is not None:
             return util.fmt_seconds(value)
         else:
             return value
-
+    
     def tag_by_index(self, index):
         return self.tag_text(self.ALLOWED_TAGS[index])
-
+    
     def update_tags(self, tags):
         for tag, value in tags.items():
             if tag not in self._tags:
                 minirok.logger.warn('unknown tag %s', tag)
                 continue
             self._tags[tag] = value
-
+    
     ##
 
     # XXX-KDE4 TODO
@@ -1321,6 +1312,7 @@ class Columns(QtGui.QHeaderView):
         ('Album', 200, 0),
         ('Title', 275, 1),
         ('Date', 60, 0),
+        ('Comment', 200, 1),
         ('Length', 60, 1)
     ]
 

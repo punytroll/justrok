@@ -23,70 +23,69 @@ class TagReader(util.ThreadedWorker):
     
     @staticmethod
     def tags(path):
+        print("Reading tag for \"" + path + "\"")
+        result = {}
         try:
-            info = mutagen.File(path)
-            if isinstance(info, mutagen.mp3.MP3):
-                # We really want an EasyID3 object, so we re-read the tags now.
-                # Alas, EasyID3 does not include the .info part, which contains
-                # the length, so we save it from the MP3 object.
-                dot_info = info.info
+            complex_info = mutagen.File(path)
+            if isinstance(complex_info, mutagen.mp3.MP3):
                 try:
-                    info = mutagen.easyid3.EasyID3(path)
+                    simple_info = mutagen.easyid3.EasyID3(path)
                 except mutagen.id3.ID3NoHeaderError:
-                    info = mutagen.easyid3.EasyID3()
-                info.info = dot_info
-            elif info is None:
-                minirok.logger.warning(
-                    'could not read tags from %s: mutagen.File() returned None',
-                    path)
-                return {}
-        except Exception as e:
+                    simple_info = mutagen.easyid3.EasyID3()
+            else:
+                minirok.logger.warning('could not read tags from %s: mutagen.File() returned None', path)
+                return result
+        except Exception as exception:
             if path in str(e):  # Mutagen included the path in the exception.
                 msg = 'could not read tags: %s' % e
             else:
                 msg = 'could not read tags from %s: %s' % (path, e)
             minirok.logger.warning(msg)
-            return {}
-        print(info)
-        result = {}
+            return result
+        print("    " + str(complex_info))
+        print("    " + str(simple_info))
         # Track
-        if "WM/TrackNumber" in info and type(info["WM/TrackNumber"][0]) is mutagen.asf.ASFUnicodeAttribute:
-            result["Track"] = info["WM/TrackNumber"][0].value
-        elif "tracknumber" in info and "tracktotal" in info:
-            result["Track"] = info["tracknumber"][0] + '/' + info["tracktotal"][0]
-        elif "tracknumber" in info:
-            result["Track"] = info["tracknumber"][0]
+        if "WM/TrackNumber" in simple_info and type(simple_info["WM/TrackNumber"][0]) is mutagen.asf.ASFUnicodeAttribute:
+            result["Track"] = simple_info["WM/TrackNumber"][0].value
+        elif "tracknumber" in simple_info and "tracktotal" in simple_info:
+            result["Track"] = simple_info["tracknumber"][0] + '/' + simple_info["tracktotal"][0]
+        elif "tracknumber" in simple_info:
+            result["Track"] = simple_info["tracknumber"][0]
         # Disc
-        if "WM/PartOfSet" in info and type(info["WM/PartOfSet"][0]) is mutagen.asf.ASFUnicodeAttribute:
-            result["Disc"] = info["WM/PartOfSet"][0].value
-        elif "discnumber" in info and "disctotal" in info:
-            result["Disc"] = info["discnumber"][0] + "/" + info["disctotal"][0]
-        elif "discnumber" in info:
-            result["Disc"] = info["discnumber"][0]
+        if "WM/PartOfSet" in simple_info and type(simple_info["WM/PartOfSet"][0]) is mutagen.asf.ASFUnicodeAttribute:
+            result["Disc"] = simple_info["WM/PartOfSet"][0].value
+        elif "discnumber" in simple_info and "disctotal" in simple_info:
+            result["Disc"] = simple_info["discnumber"][0] + "/" + simple_info["disctotal"][0]
+        elif "discnumber" in simple_info:
+            result["Disc"] = simple_info["discnumber"][0]
         # Date
-        if "WM/Year" in info and type(info["WM/Year"][0]) is mutagen.asf.ASFUnicodeAttribute:
-            result["Date"] = info["WM/Year"][0].value
-        elif "date" in info:
-            result["Date"] = info["date"][0]
+        if "WM/Year" in simple_info and type(simple_info["WM/Year"][0]) is mutagen.asf.ASFUnicodeAttribute:
+            result["Date"] = simple_info["WM/Year"][0].value
+        elif "date" in simple_info:
+            result["Date"] = simple_info["date"][0]
         # Album
-        if "WM/AlbumTitle" in info and type(info["WM/AlbumTitle"][0]) is mutagen.asf.ASFUnicodeAttribute:
-            result["Album"] = info["WM/AlbumTitle"][0].value
-        elif "album" in info :
-            result["Album"] = info["album"][0]
+        if "WM/AlbumTitle" in simple_info and type(simple_info["WM/AlbumTitle"][0]) is mutagen.asf.ASFUnicodeAttribute:
+            result["Album"] = simple_info["WM/AlbumTitle"][0].value
+        elif "album" in simple_info :
+            result["Album"] = simple_info["album"][0]
         # Title
-        if "Title" in info and type(info["Title"][0]) is mutagen.asf.ASFUnicodeAttribute:
-            result["Title"] = info["Title"][0].value
-        elif "title" in info:
-            result["Title"] = info["title"][0]
+        if "Title" in simple_info and type(simple_info["Title"][0]) is mutagen.asf.ASFUnicodeAttribute:
+            result["Title"] = simple_info["Title"][0].value
+        elif "title" in simple_info:
+            result["Title"] = simple_info["title"][0]
         # Artist
-        if "WM/AlbumArtist" in info and type(info["WM/AlbumArtist"][0]) is mutagen.asf.ASFUnicodeAttribute:
-            result["Artist"] = info["WM/AlbumArtist"][0].value
-        elif "artist" in info:
-            result["Artist"] = info["artist"][0]
+        if "WM/AlbumArtist" in simple_info and type(simple_info["WM/AlbumArtist"][0]) is mutagen.asf.ASFUnicodeAttribute:
+            result["Artist"] = simple_info["WM/AlbumArtist"][0].value
+        elif "artist" in simple_info:
+            result["Artist"] = simple_info["artist"][0]
+        # Commentary
+        commentary_frames = complex_info.tags.getall("COMM")
+        if len(commentary_frames) > 0:
+            result["Commentary"] = commentary_frames[0].text[0]
         # Length
         try:
-            result['Length'] = int(info.info.length)
+            result['Length'] = int(complex_info.info.length)
         except AttributeError:
             pass
-        
+        print("    " + str(result))
         return result
