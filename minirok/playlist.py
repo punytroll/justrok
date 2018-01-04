@@ -1189,7 +1189,7 @@ class PlaylistView(QtGui.QTreeView):
 
 class PlaylistItem(object):
     
-    ALLOWED_TAGS = [ 'Track', 'Artist', 'Album', 'Title', 'Length', 'Disc', 'Date', 'Commentary' ]
+    ALLOWED_TAGS = [ 'Track', 'Artist', 'Album', 'Title', 'Length', 'Disc', 'Date', 'Comment' ]
     
     def __init__(self, path, tags=None):
         self.path = path
