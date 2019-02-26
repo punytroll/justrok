@@ -91,7 +91,9 @@ class TagReader(util.ThreadedWorker):
                 # Commentary
                 if "comment" in complex_info:
                     result["Comment"] = complex_info["comment"][0]
-                if isinstance(complex_info, mutagen.mp3.MP3) == True:
+                elif "description" in complex_info:
+                    result["Comment"] = complex_info["description"][0]
+                elif isinstance(complex_info, mutagen.mp3.MP3) == True and complex_info.tags != None:
                     comment_frames = complex_info.tags.getall("COMM")
                     if len(comment_frames) > 0:
                         result["Comment"] = comment_frames[0].text[0]
