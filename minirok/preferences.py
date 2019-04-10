@@ -15,11 +15,7 @@ import minirok
 from minirok import util
 if minirok._has_scrobble == True:
     from minirok import scrobble
-try:
-    from minirok.ui import options1
-except ImportError:
-    from minirok.ui.error import options1
-    minirok.logger.warn('compiled files under ui/ missing')
+from minirok import options
 
 ##
 
@@ -126,7 +122,6 @@ class Dialog(kdeui.KConfigDialog):
 
     def slotButtonClicked(self, button):
         if (button in [kdeui.KDialog.Ok, kdeui.KDialog.Apply]
-            and not hasattr(options1.Ui_Page, 'NO_UI')
             and not self.check_valid_regex()):
             pass  # Don't let the button close the dialog.
         else:
@@ -134,14 +129,10 @@ class Dialog(kdeui.KConfigDialog):
 
 ##
 
-class GeneralPage(QtGui.QWidget, options1.Ui_Page):
+class GeneralPage(QtGui.QWidget, options.Ui_Page):
     def __init__(self, parent, preferences):
         QtGui.QWidget.__init__(self, parent)
         self.setupUi(self)
-
-        if getattr(self, 'NO_UI', False):
-            # This Ui_Page comes from ui/error.py.
-            return
 
         self.connect(self.kcfg_TagsFromRegex,
                      QtCore.SIGNAL('toggled(bool)'),
