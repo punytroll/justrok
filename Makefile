@@ -1,11 +1,7 @@
-all: ui minirok.1
+all: ui
 
 ui:
-	$(MAKE) -C $(CURDIR)/minirok/ui
+	$(MAKE) -C minirok/ui
 
 clean:
-	rm -f minirok.1
-	$(MAKE) -C $(CURDIR)/minirok/ui clean
-
-minirok.1: minirok.xml
-	docbook2x-man $<
+	$(MAKE) -C minirok/ui clean
