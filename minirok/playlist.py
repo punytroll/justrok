@@ -539,6 +539,17 @@ class Playlist(QtCore.QAbstractTableModel):
 
             self.currently_playing = self.current_item
             self.currently_playing.already_played = True
+            # assemble file name for cover image
+            tags = self.current_item.tags()
+            if "Artist" in tags and "Album" in tags:
+                file_name = tags["Artist"] + " - " + tags["Album"] + " (Front)"
+                file_path = os.path.join(os.path.dirname(os.path.abspath(self.current_item.path)), file_name) + ".jpg"
+                if os.path.exists(file_path) == True:
+                    print("The cover file can be found at \"" + file_path + "\".")
+                else:
+                    print("No cover file could be found.")
+            else:
+                print("No artist or album information available.")
             minirok.Globals.engine.play(self.current_item.path)
 
             if self.current_item.tags()['Length'] is None:
